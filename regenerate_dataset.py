@@ -5,6 +5,13 @@ import torch
 
 class RegenerateDataset:
     def __init__(self, left_dataset, right_dataset):
+        """
+        Initialize the RegenerateDataset class.
+
+        Args:
+            left_dataset (str): File path of the first dataset.
+            right_dataset (str): File path of the second dataset.
+        """
         self.data_frame = None
         self.left_dataset = pd.read_csv(f'{left_dataset}')
         self.right_dataset = pd.read_csv(f'{right_dataset}')
@@ -12,7 +19,9 @@ class RegenerateDataset:
         self.model = BertForSequenceClassification.from_pretrained('bert_finetuned')
 
     def generate_dataset(self):
-        import pandas as pd
+        """
+        Combine the left and right datasets into a single DataFrame.
+        """
         final_data = dict()
         final_data['text'] = list(self.left_dataset['text'])
         final_data['label'] = list(self.left_dataset['label'])
@@ -21,6 +30,10 @@ class RegenerateDataset:
         self.data_frame = pd.DataFrame(final_data)
 
     def predict_dataset(self):
+        """
+        Predict the labels for the combined dataset and update the DataFrame accordingly.
+        """
+        # Replace label 1 with 3 in the dataset
         self.data_frame['label'] = self.data_frame['label'].replace(1, 3)
 
         # Iterate through DataFrame and update labels where current label is 0

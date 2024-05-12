@@ -6,6 +6,13 @@ import torch
 
 class BertTrainer:
     def __init__(self, dataset, model_path):
+        """
+        Initialize the BertTrainer class.
+
+        Args:
+            dataset (str): File path of the dataset.
+            model_path (str): Path to the pre-trained BERT model.
+        """
         self.dataset = pd.read_csv(f'{dataset}')
         self.tokenizer = BertTokenizer.from_pretrained(f'{model_path}')
         num_labels = self.dataset['label'].nunique()
@@ -15,15 +22,33 @@ class BertTrainer:
         self.dataset['label'] = self.dataset['label'].astype(int)
 
     def tokenize_function(self, examples):
+        """
+        Tokenization function to tokenize text samples.
+
+        Args:
+            examples (dict): Dictionary containing text samples.
+
+        Returns:
+            dict: Tokenized text samples.
+        """
         return self.tokenizer(examples['tweet'], padding="max_length", truncation=True, max_length=128)
 
     def data_process(self):
+        """
+        Process the dataset by tokenizing text samples and splitting into train and test sets.
+
+        Returns:
+            Dataset, Dataset: Train and test datasets.
+        """
         hf_dataset = Dataset.from_pandas(self.dataset)
         tokenized_datasets = hf_dataset.map(self.tokenize_function, batched=True)
         train_dataset, test_dataset = tokenized_datasets.train_test_split(test_size=0.1).values()
         return train_dataset, test_dataset
 
     def train(self):
+        """
+        Train the BERT model using the specified training arguments.
+        """
         train_dataset, test_dataset = self.data_process()
         training_args = TrainingArguments(
             output_dir='./results',            # Where to store the model outputs
